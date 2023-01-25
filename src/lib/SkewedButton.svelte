@@ -1,9 +1,8 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { circIn } from "svelte/easing";
 
     export let gravitate = null;
-    export let background_color = "rgb(0, 110, 255)";
+    export let background = "rgb(245,94,10)";
 
     let emit = createEventDispatcher();
 
@@ -15,7 +14,7 @@
 <button
     class="button"
     style={(gravitate ? `margin-${gravitate}: -10px;` : "") +
-        `background-color: ${background_color}`}
+        `background: ${background}`}
     on:click={clicked}
 >
     <div class="text">

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
-    import Aux from "../AuxBtn";
+    import Aux from "../lib/AuxBtn";
+    import Card from "../lib/Card.svelte";
     import SkewedButton from "../lib/SkewedButton.svelte";
 
     let s = createEventDispatcher();
@@ -41,12 +42,12 @@
     <h2>Zvol balík k otevření</h2>
     <div class="listing">
         {#each listing as item, i}
-            <button class="item" on:click={() => load(i)}>
+            <Card on:click={() => load(i)}>
                 <h1>
                     {item.name}
                 </h1>
                 {item.description}
-            </button>
+            </Card>
         {/each}
     </div>
 {:else}
@@ -57,33 +58,12 @@
 <style>
     .listing {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column;
+        justify-content: center;
+        max-width: 800px;
     }
 
-    .item {
-        background-color: #ddd;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: left;
-        border: none;
-        transition: 0.3s;
-        max-width: 400px;
-        margin-right: 24px;
-        margin-bottom: 24px;
-    }
-
-    .item:hover {
-        background-color: #eee;
-        transform: scale(1.05);
-    }
-
-    .item:active {
-        background-color: #fff;
-        transform: scale(0.95);
-    }
-
-    h1 {
+    .listing :global(h1) {
         margin-top: 0;
         margin-bottom: 8px;
     }

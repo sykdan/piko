@@ -1,25 +1,54 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { csvParse } from "d3-dsv";
-    import Aux from "../AuxBtn";
+    import Aux from "../lib/AuxBtn";
     import SkewedButton from "../lib/SkewedButton.svelte";
+    import Overlay from "../lib/Overlay.svelte";
+    import Card from "../lib/Card.svelte";
+
     // the {something} of the ./data/{something} url
     export let base = "";
 
     let loaded = false;
     let loading_errored = false;
+    let showing_listing = false;
 
     // html and csv contents
     let schema;
     let cards;
 
     // index of the currently displayed card
-    let viewing_card = null;
+    let viewing_card: number = null;
 
-    let display_second_side = false;
+    let spin: boolean = false;
+    let display_second_side: boolean = false;
 
     $: if (viewing_card != null) {
         display_second_side = false;
+    }
+
+    $: if (viewing_card != null) {
+        $Aux.text = `${viewing_card + 1}/${cards.length}`;
+    }
+
+    async function turn() {
+        if (spin) {
+            return;
+        }
+        spin = true;
+        let _validate = display_second_side;
+        setTimeout(() => {
+            if (display_second_side == _validate) {
+                display_second_side = !display_second_side;
+                setTimeout(() => {
+                    spin = false;
+                }, 100);
+            }
+        }, 100);
+    }
+
+    function showListing() {
+        showing_listing = !showing_listing;
     }
 
     const emit = createEventDispatcher();
@@ -50,10 +79,8 @@
     }
 
     onMount(() => {
-        $Aux.text = "jít zpět";
-        $Aux.callback = () => {
-            emit("close");
-        };
+        $Aux.text = null;
+        $Aux.callback = showListing;
         performLoad();
     });
 
@@ -74,82 +101,109 @@
         viewing_card = c;
     }
 </script>
-    {#if loaded && !loading_errored}
-        <div class="card" class:display_second_side>
-            {#if viewing_card != null}
-                <span class="index">
-                    karta {viewing_card + 1}/{cards.length}
-                </span>
-                {@html cards.columns.reduce(
-                    (html, word) =>
-                        html.replaceAll(
-                            `{{${word}}}`,
-                            cards[viewing_card][word]
-                        ),
-                    schema
-                )}
-            {/if}
-        </div>
 
-        <SkewedButton
-            on:click={() => {
-                display_second_side = !display_second_side;
-            }}
-        >
-            {display_second_side ? "Skryj" : "Ukaž"} druhou stranu
-        </SkewedButton>
+{#if loaded && !loading_errored}
+    <!-- Main content -->
+    <div class="card" class:display_second_side class:spin>
+        {#if viewing_card != null}
+            {@html cards.columns.reduce(
+                (html, word) =>
+                    html.replaceAll(`{{${word}}}`, cards[viewing_card][word]),
+                schema
+            )}
+        {/if}
+    </div>
 
-        <div class="controls">
-            <SkewedButton on:click={() => jump(-1)}>&lt;</SkewedButton>
-            <SkewedButton on:click={() => jump(1)}>&gt;</SkewedButton>
-        </div>
-    {:else if loading_errored}
-        <h2>při načítání došlo k chybě</h2>
-        <SkewedButton on:click={performLoad}>zkusit znovu</SkewedButton>
-    {:else}
-        <h2>načítání...</h2>
+    <SkewedButton on:click={turn}>
+        {display_second_side ? "Skryj" : "Ukaž"} druhou stranu
+    </SkewedButton>
+
+    <div class="controls">
+        <SkewedButton on:click={() => jump(-1)}>&lt;</SkewedButton>
+        <SkewedButton on:click={() => jump(1)}>&gt;</SkewedButton>
+    </div>
+
+    {#if showing_listing}
+        <Overlay zIndex={1}>
+            <div class="listing">
+                {#each cards as card}
+                <Card>
+                    {JSON.stringify(card)}
+                </Card>
+                {/each}
+            </div>
+        </Overlay>
     {/if}
+{:else if loading_errored}
+    <!-- Loading error -->
+    <h2>při načítání došlo k chybě</h2>
+    <SkewedButton on:click={performLoad}>zkusit znovu</SkewedButton>
+{:else}
+    <!-- Loading -->
+    <h2>načítání...</h2>
+{/if}
 
 <style>
+    @keyframes spin {
+        0% {
+            transform: scaleX(1);
+        }
+
+        50% {
+            transform: scaleX(0);
+        }
+
+        100% {
+            transform: scaleX(1);
+        }
+    }
+
     .card {
+        width: 100%;
+        max-width: 800px;
+        height: 100%;
+        padding: 16px 0;
+        margin-bottom: 8px;
         display: flex;
+
+        position: relative;
         flex: 1;
         flex-direction: column;
-        background: white;
-        padding: 16px 0;
-
-        border-radius: 24px;
-        margin-bottom: 16px;
-        width: 100%;
-        height: 100%;
-        position: relative;
-        overflow: scroll;
-
         align-items: center;
         text-align: center;
+        overflow: auto;
+
+        background: rgb(236, 235, 243);
+        border-radius: 24px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
     }
 
     .card :global(img) {
-        max-height: 500px;
-        max-width: 500px;
-    }
-
-    .index {
-        position: absolute;
-        top: 16px;
-        left: 16px;
+        max-width: 95%;
     }
 
     .controls {
-        margin-top: 16px;
-        width: 100%;
+        margin-top: 8px;
+        width: 90%;
         max-width: 600px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
     }
 
+    .card.spin {
+        animation: spin 0.2s cubic-bezier(0.37, 0, 0.63, 1);
+    }
+
     .card:not(.display_second_side) :global(.back) {
         display: none;
+    }
+
+    .card.display_second_side :global(.front) {
+        display: none;
+    }
+
+    .listing {
+        max-width: 800px;
     }
 </style>

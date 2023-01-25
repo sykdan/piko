@@ -1,77 +1,86 @@
 <script lang="ts">
+    // Screens
     import MainScreen from "./screens/MainScreen.svelte";
-    import Aux from "./AuxBtn";
-    import SkewedButton from "./lib/SkewedButton.svelte";
-    import { version } from "../package.json";
     import CardView from "./screens/CardView.svelte";
 
-    let openedPackUrl = null;
+    // Components
+    import SkewedButton from "./lib/SkewedButton.svelte";
+    import Aux from "./lib/AuxBtn";
 
-    function info() {
-        alert(`PikoAnki verze ${version}\nVytvořil Daniel Sýkora`);
+    // Misc
+    import { version } from "../package.json";
+
+    enum ScreenState {
+        MainScreen,
+        CardView,
+    }
+
+    let screen: ScreenState = ScreenState.MainScreen;
+
+    let openedPackUrl: string = null;
+
+    function home() {
+        if (screen == ScreenState.MainScreen) {
+            alert(`PikoAnki verze ${version}\nVytvořil Daniel Sýkora`);
+        } else {
+            screen = ScreenState.MainScreen;
+        }
     }
 
     function begin(e) {
         openedPackUrl = e.detail;
         screen = ScreenState.CardView;
     }
-
-    enum ScreenState {
-        Main,
-        CardView,
-    }
-
-    let screen = ScreenState.Main;
 </script>
 
-<div class="root">
-    <div class="header">
-        <SkewedButton gravitate="left" on:click={info}>PikoAnki</SkewedButton>
-        <div style="width: 100%;" />
-        {#if $Aux.text}
-            <SkewedButton
-                gravitate="right"
-                on:click={$Aux.callback}
-                background_color="gray"
-            >
-                {$Aux.text}
-            </SkewedButton>
-        {/if}
-    </div>
+<div class="header">
+    <SkewedButton
+        gravitate="left"
+        on:click={home}
+        background="linear-gradient(90deg, rgba(194,1,20,1) 0%, rgba(245,94,10,1) 100%)"
+        >Piko (Anki)</SkewedButton
+    >
+    <div style="width: 100%;" />
+    {#if $Aux.text}
+        <SkewedButton
+            gravitate="right"
+            on:click={$Aux.callback}
+            background="rgb(109, 114, 117)"
+        >
+            {$Aux.text}
+        </SkewedButton>
+    {/if}
+</div>
 
-    <div class="content">
-        <div class="wrap">
-            {#if screen == ScreenState.Main}
-                <MainScreen on:begin={begin} />
-            {:else if screen == ScreenState.CardView}
-                <CardView
-                    on:close={() => {
-                        screen = ScreenState.Main;
-                    }}
-                    base={openedPackUrl}
-                />
-            {/if}
-        </div>
+<div class="content">
+    <div class="wrap">
+        {#if screen == ScreenState.MainScreen}
+            <MainScreen on:begin={begin} />
+        {:else if screen == ScreenState.CardView}
+            <CardView
+                on:close={() => {
+                    screen = ScreenState.MainScreen;
+                }}
+                base={openedPackUrl}
+            />
+        {/if}
     </div>
 </div>
 
 <style>
-    .root {
-        display: flex;
-        flex-direction: column;
-        background-color: silver;
-        height: 100%;
-    }
-
     .header {
-        display: flex;
-        flex-direction: row;
-        background-color: #2d2d2d;
-        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-        color: white;
-        align-items: center;
-        font-weight: bold;
         height: 48px;
+        display: flex;
+
+        flex-direction: row;
+        align-items: center;
+
+        color: white;
+        background-color: #0f0f0f;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+        font-weight: bold;
+        margin-bottom: 8px;
+        z-index: 999;
     }
 
     .content {
@@ -82,11 +91,20 @@
     }
 
     .wrap {
-        display: flex;
         width: 100%;
+        padding: 16px;
+
+        display: flex;
         overflow: hidden;
         flex-direction: column;
         align-items: center;
-        padding: 16px;
+
+        transition: padding 0.5s;
+    }
+
+    @media (max-width: 600px) {
+        .wrap {
+            padding: 2px;
+        }
     }
 </style>
