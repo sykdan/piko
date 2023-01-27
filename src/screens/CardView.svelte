@@ -6,12 +6,15 @@
     import Overlay from "../lib/Overlay.svelte";
     import Card from "../lib/Card.svelte";
 
+    const emit = createEventDispatcher();
+
     // the {something} of the ./data/{something} url
     export let base = "";
 
-    let loaded = false;
-    let loading_errored = false;
-    let showing_listing = false;
+    let loading_finished = false;
+    let loading_error = false;
+
+    let show_listing = false;
 
     // html and csv contents
     let schema;
@@ -20,42 +23,36 @@
     // index of the currently displayed card
     let viewing_card: number = null;
 
+    // whether the spin animation should play
     let spin: boolean = false;
-    let display_second_side: boolean = false;
+    // display
+    let show_back_instead_of_front: boolean = false;
 
+    // Reactive hooks: These expressions run when any of the checked values change.
     $: if (viewing_card != null) {
-        display_second_side = false;
+        show_back_instead_of_front = false;
     }
-
     $: if (viewing_card != null) {
         $Aux.text = `${viewing_card + 1}/${cards.length}`;
     }
 
-    async function turn() {
-        if (spin) {
-            return;
-        }
-        spin = true;
-        let _validate = display_second_side;
-        setTimeout(() => {
-            if (display_second_side == _validate) {
-                display_second_side = !display_second_side;
-                setTimeout(() => {
-                    spin = false;
-                }, 100);
-            }
-        }, 100);
-    }
+    onMount(() => {
+        $Aux.text = null;
+        $Aux.callback = () => {
+            show_listing = !show_listing;
+        };
+        performLoad();
+    });
 
-    function showListing() {
-        showing_listing = !showing_listing;
-    }
+    onDestroy(() => {
+        $Aux.text = null;
+        $Aux.callback = null;
+    });
 
-    const emit = createEventDispatcher();
-
+    // download all the data
     async function performLoad() {
-        loaded = false;
-        loading_errored = false;
+        loading_finished = false;
+        loading_error = false;
         schema = null;
         cards = null;
         viewing_card = null;
@@ -72,24 +69,29 @@
             cards = csvParse(await _ca.text());
 
             viewing_card = 0;
-            loaded = true;
+            loading_finished = true;
         } catch {
-            loading_errored = true;
+            loading_error = true;
         }
     }
 
-    onMount(() => {
-        $Aux.text = null;
-        $Aux.callback = showListing;
-        performLoad();
-    });
+    // play the card turning animation
+    function turn() {
+        if (spin) {
+            return;
+        }
+        spin = true;
+        setTimeout(() => {
+            show_back_instead_of_front = !show_back_instead_of_front;
+            setTimeout(() => {
+                spin = false;
+            }, 100);
+        }, 100);
+    }
 
-    onDestroy(() => {
-        $Aux.text = null;
-        $Aux.callback = null;
-    });
-
-    function jump(by) {
+    // Skip this many cards and check for wrapping around 0 and cards.length
+    function jump(by: number) {
+        // Offload to a variable to prevent rerendering
         let c = viewing_card + by;
         if (c < 0) {
             c = cards.length - 1;
@@ -97,19 +99,19 @@
         if (c >= cards.length) {
             c = 0;
         }
-
         viewing_card = c;
     }
 
-    function selectCardFromList(index) {
+    // On card from list selected
+    function selectCardFromList(index: number) {
         viewing_card = index;
-        showing_listing = false;
+        show_listing = false;
     }
 </script>
 
-{#if loaded && !loading_errored}
+{#if loading_finished && !loading_error}
     <!-- Main content -->
-    <div class="card" class:display_second_side class:spin>
+    <div class="card" class:show_back_instead_of_front class:spin>
         {#if viewing_card != null}
             {@html cards.columns.reduce(
                 (html, word) =>
@@ -120,7 +122,7 @@
     </div>
 
     <SkewedButton on:click={turn}>
-        {display_second_side ? "Skryj" : "Ukaž"} druhou stranu
+        {show_back_instead_of_front ? "Skryj" : "Ukaž"} druhou stranu
     </SkewedButton>
 
     <div class="controls">
@@ -128,7 +130,7 @@
         <SkewedButton on:click={() => jump(1)}>&gt;</SkewedButton>
     </div>
 
-    {#if showing_listing}
+    {#if show_listing}
         <Overlay zIndex={1}>
             <div class="listing">
                 {#each cards as card, i}
@@ -148,7 +150,7 @@
             </div>
         </Overlay>
     {/if}
-{:else if loading_errored}
+{:else if loading_error}
     <!-- Loading error -->
     <h2>při načítání došlo k chybě</h2>
     <SkewedButton on:click={performLoad}>zkusit znovu</SkewedButton>
@@ -209,11 +211,11 @@
         animation: spin 0.2s cubic-bezier(0.37, 0, 0.63, 1);
     }
 
-    .card:not(.display_second_side) :global(.back) {
+    .card:not(.show_back_instead_of_front) :global(.back) {
         display: none;
     }
 
-    .card.display_second_side :global(.front) {
+    .card.show_back_instead_of_front :global(.front) {
         display: none;
     }
 

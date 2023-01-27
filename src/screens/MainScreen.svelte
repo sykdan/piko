@@ -7,16 +7,16 @@
     let s = createEventDispatcher();
 
     let listing: any[] = null;
-    let error_loading = false;
+    let loading_error = false;
 
     async function performLoad() {
-        error_loading = false;
+        loading_error = false;
         listing = null;
         try {
             let f = await fetch("data/listing.json", { cache: "no-store" });
             listing = await f.json();
         } catch {
-            error_loading = true;
+            loading_error = true;
         }
     }
 
@@ -36,9 +36,9 @@
     }
 </script>
 
-{#if !listing && !error_loading}
+{#if !listing && !loading_error}
     <h2>načítání...</h2>
-{:else if !error_loading}
+{:else if !loading_error}
     <h2>Zvol balík k otevření</h2>
     <div class="listing">
         {#each listing as item, i}
