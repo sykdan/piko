@@ -17,22 +17,29 @@
 <style>
     .overlay-wrap {
         position: fixed;
-        top: 0;
+        top: 48px;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: calc(100% - 48px);
         display: flex;
-        overflow-x: hidden;
+        overflow: hidden;
     }
     
     .overlay {
-        padding-top: 64px;
-        padding-bottom: 16px;
+        padding: 16px;
         overflow-y: auto;
         width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         background-color: rgba(0, 0, 0, 0.5);
+        overflow-x: hidden;
+    }
+
+    @media (max-width: 600px) {
+        .overlay {
+            padding-left: 2px;
+            padding-right: 2px;
+        }
     }
 </style>

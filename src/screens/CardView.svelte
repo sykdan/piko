@@ -100,6 +100,11 @@
 
         viewing_card = c;
     }
+
+    function selectCardFromList(index) {
+        viewing_card = index;
+        showing_listing = false;
+    }
 </script>
 
 {#if loaded && !loading_errored}
@@ -126,10 +131,19 @@
     {#if showing_listing}
         <Overlay zIndex={1}>
             <div class="listing">
-                {#each cards as card}
-                <Card>
-                    {JSON.stringify(card)}
-                </Card>
+                {#each cards as card, i}
+                    <Card on:click={() => selectCardFromList(i)}>
+                        <div class="overlay-card">
+                            <h1>{i + 1}</h1>
+                            {cards.columns.reduce((content, word) => {
+                                let w = card[word];
+                                if (w != "") {
+                                    content = content + w + "; ";
+                                }
+                                return content;
+                            }, "")}
+                        </div>
+                    </Card>
                 {/each}
             </div>
         </Overlay>
@@ -204,6 +218,21 @@
     }
 
     .listing {
+        display: flex;
+        flex-direction: column;
         max-width: 800px;
+        width: 100%;
+    }
+
+    .overlay-card {
+        padding: 0 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .overlay-card h1 {
+        margin: 8px 24px 8px 0px;
     }
 </style>

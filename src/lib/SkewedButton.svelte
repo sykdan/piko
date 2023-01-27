@@ -39,10 +39,12 @@
 
     .button:hover {
         padding: 0 20px;
+        filter: brightness(1.1);
     }
-
+    
     .button:active {
-        filter: brightness(1.3);
+        padding: 0 15px;
+        filter: none;
     }
 
     .text {
