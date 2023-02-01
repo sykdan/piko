@@ -23,7 +23,7 @@
         border: none;
         border-radius: 8px;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-        transition: 0.3s;
+        transition: 0.1s;
     }
 
     .item:hover {

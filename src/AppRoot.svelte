@@ -20,6 +20,7 @@
     let openedPackUrl: string = null;
 
     function home() {
+        window.location.hash = "";
         if (screen == ScreenState.MainScreen) {
             alert(`PikoAnki verze ${version}\nVytvořil Daniel Sýkora`);
         } else {
@@ -27,9 +28,13 @@
         }
     }
 
-    function begin(e) {
-        openedPackUrl = e.detail;
+    function openCardPack(pack) {
+        openedPackUrl = pack;
         screen = ScreenState.CardView;
+    }
+
+    function begin(e) {
+        openCardPack(e.detail);
     }
 </script>
 

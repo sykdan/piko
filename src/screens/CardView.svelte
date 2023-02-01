@@ -33,7 +33,11 @@
         show_back_instead_of_front = false;
     }
     $: if (viewing_card != null) {
-        $Aux.text = `${viewing_card + 1}/${cards.length}`;
+        if (show_listing) {
+            $Aux.text = "×";
+        } else {
+            $Aux.text = `${viewing_card + 1}/${cards.length}`;
+        }
     }
 
     onMount(() => {
@@ -70,6 +74,7 @@
 
             viewing_card = 0;
             loading_finished = true;
+            window.location.hash = base;
         } catch {
             loading_error = true;
         }

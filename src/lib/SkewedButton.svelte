@@ -31,7 +31,7 @@
         border: none;
         user-select: none;
 
-        padding: 0 10px;
+        padding: 0 15px;
         transform: skewX(-20deg);
         transition: 0.2s;
         align-items: center;
@@ -43,7 +43,7 @@
     }
     
     .button:active {
-        padding: 0 15px;
+        padding: 0 10px;
         filter: none;
     }
 

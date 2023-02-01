@@ -20,10 +20,17 @@
         }
     }
 
+    onMount(() => {});
+
     onMount(() => {
         performLoad();
         $Aux.text = "načíst znovu";
         $Aux.callback = performLoad;
+
+        let hash = window.location.hash.substring(1);
+        if (hash) {
+            openCardPack(hash);
+        }
     });
 
     onDestroy(() => {
@@ -31,8 +38,8 @@
         $Aux.callback = null;
     });
 
-    function load(i) {
-        s("begin", listing[i].contents);
+    function openCardPack(name) {
+        s("begin", name);
     }
 </script>
 
@@ -42,7 +49,7 @@
     <h2>Zvol balík k otevření</h2>
     <div class="listing">
         {#each listing as item, i}
-            <Card on:click={() => load(i)}>
+            <Card on:click={() => openCardPack(item.contents)}>
                 <h1>
                     {item.name}
                 </h1>
