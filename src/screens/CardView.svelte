@@ -8,21 +8,31 @@
 
     const emit = createEventDispatcher();
 
+    onMount(() => {
+        $Aux.text = null;
+        $Aux.callback = () => {
+            show_listing = !show_listing;
+        };
+    });
+
+    onDestroy(() => {
+        $Aux.text = null;
+        $Aux.callback = null;
+    });
+
     // the {something} of the ./data/{something} url
     export let base = "";
 
-    let loading_finished = false;
-    let loading_error = false;
-
-    let show_listing = false;
-
+    
     // html and csv contents
     let schema;
     let cards;
-
+    
     // index of the currently displayed card
     let viewing_card: number = null;
-
+    
+    let show_listing = false;
+    
     // whether the spin animation should play
     let spin: boolean = false;
     // display
@@ -40,44 +50,29 @@
         }
     }
 
-    onMount(() => {
-        $Aux.text = null;
-        $Aux.callback = () => {
-            show_listing = !show_listing;
-        };
-        performLoad();
-    });
-
-    onDestroy(() => {
-        $Aux.text = null;
-        $Aux.callback = null;
-    });
-
     // download all the data
-    async function performLoad() {
-        loading_finished = false;
-        loading_error = false;
+    let loading = _fetchData();
+    async function _fetchData() {
         schema = null;
         cards = null;
         viewing_card = null;
 
         const root = "./data/" + base + "/";
 
-        try {
-            let _sc = await fetch(root + "schema.html");
-            let _ca = await fetch(root + "data.csv");
-            if (!_sc.ok || !_ca.ok) {
-                throw 0;
-            }
-            schema = await _sc.text();
-            cards = csvParse(await _ca.text());
-
-            viewing_card = 0;
-            loading_finished = true;
-            window.location.hash = base;
-        } catch {
-            loading_error = true;
+        let _sc = await fetch(root + "schema.html");
+        let _ca = await fetch(root + "data.csv");
+        if (!_sc.ok || !_ca.ok) {
+            throw 0;
         }
+        schema = await _sc.text();
+        cards = csvParse(await _ca.text());
+
+        viewing_card = 0;
+        window.location.hash = base;
+    }
+
+    function load() {
+        loading = _fetchData();
     }
 
     // play the card turning animation
@@ -114,7 +109,10 @@
     }
 </script>
 
-{#if loading_finished && !loading_error}
+{#await loading}
+    <!-- Loading -->
+    <h2>načítání...</h2>
+{:then}
     <!-- Main content -->
     <div class="card" class:show_back_instead_of_front class:spin>
         {#if viewing_card != null}
@@ -155,14 +153,11 @@
             </div>
         </Overlay>
     {/if}
-{:else if loading_error}
+{:catch}
     <!-- Loading error -->
     <h2>při načítání došlo k chybě</h2>
-    <SkewedButton on:click={performLoad}>zkusit znovu</SkewedButton>
-{:else}
-    <!-- Loading -->
-    <h2>načítání...</h2>
-{/if}
+    <SkewedButton on:click={load}>zkusit znovu</SkewedButton>
+{/await}
 
 <style>
     @keyframes spin {

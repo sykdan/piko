@@ -4,28 +4,11 @@
     import Card from "../lib/Card.svelte";
     import SkewedButton from "../lib/SkewedButton.svelte";
 
-    let s = createEventDispatcher();
-
-    let listing: any[] = null;
-    let loading_error = false;
-
-    async function performLoad() {
-        loading_error = false;
-        listing = null;
-        try {
-            let f = await fetch("data/listing.json", { cache: "no-store" });
-            listing = await f.json();
-        } catch {
-            loading_error = true;
-        }
-    }
-
-    onMount(() => {});
+    let emit = createEventDispatcher();
 
     onMount(() => {
-        performLoad();
         $Aux.text = "načíst znovu";
-        $Aux.callback = performLoad;
+        $Aux.callback = load;
 
         let hash = window.location.hash.substring(1);
         if (hash) {
@@ -38,14 +21,26 @@
         $Aux.callback = null;
     });
 
+    let listing: any[] = null;
+
+    let loading = _fetchData();
+    async function _fetchData() {
+        let f = await fetch("data/listing.json", { cache: "no-store" });
+        listing = await f.json();
+    }
+
+    function load() {
+        loading = _fetchData();
+    }
+
     function openCardPack(name) {
-        s("begin", name);
+        emit("begin", name);
     }
 </script>
 
-{#if !listing && !loading_error}
+{#await loading}
     <h2>načítání...</h2>
-{:else if !loading_error}
+{:then}
     <h2>Zvol balík k otevření</h2>
     <div class="listing">
         {#each listing as item, i}
@@ -57,10 +52,10 @@
             </Card>
         {/each}
     </div>
-{:else}
+{:catch}
     <h2>při načítání došlo k chybě</h2>
-    <SkewedButton on:click={performLoad}>zkusit znovu</SkewedButton>
-{/if}
+    <SkewedButton on:click={load}>zkusit znovu</SkewedButton>
+{/await}
 
 <style>
     .listing {
