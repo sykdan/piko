@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { csvParse } from "d3-dsv";
-    import Aux from "../lib/AuxBtn";
+    import Aux from "../lib/AuxButton";
     import SkewedButton from "../lib/SkewedButton.svelte";
     import Overlay from "../lib/Overlay.svelte";
     import Card from "../lib/Card.svelte";
@@ -42,6 +42,7 @@
     $: if (viewing_card != null) {
         show_back_instead_of_front = false;
     }
+    
     $: if (viewing_card != null) {
         if (show_listing) {
             $Aux.text = "×";

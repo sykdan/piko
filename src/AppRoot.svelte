@@ -1,18 +1,18 @@
 <script lang="ts">
     // Screens
     import MainScreen from "./screens/MainScreen.svelte";
-    import CardView from "./screens/CardView.svelte";
+    import DeckView from "./screens/DeckView.svelte";
 
     // Components
     import SkewedButton from "./lib/SkewedButton.svelte";
-    import Aux from "./lib/AuxBtn";
+    import Aux from "./lib/AuxButton";
 
     // Misc
     import { version } from "../package.json";
 
     enum ScreenState {
         MainScreen,
-        CardView,
+        DeckView,
     }
 
     let screen: ScreenState = ScreenState.MainScreen;
@@ -30,7 +30,7 @@
 
     function openCardPack(pack) {
         openedPackUrl = pack;
-        screen = ScreenState.CardView;
+        screen = ScreenState.DeckView;
     }
 
     function begin(e) {
@@ -61,8 +61,8 @@
     <div class="wrap">
         {#if screen == ScreenState.MainScreen}
             <MainScreen on:begin={begin} />
-        {:else if screen == ScreenState.CardView}
-            <CardView
+        {:else if screen == ScreenState.DeckView}
+            <DeckView
                 on:close={() => {
                     screen = ScreenState.MainScreen;
                 }}

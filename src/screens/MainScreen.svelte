@@ -1,7 +1,9 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
-    import Aux from "../lib/AuxBtn";
+    import Aux from "../lib/AuxButton";
     import Card from "../lib/Card.svelte";
+    import ErrorWidget from "../lib/ErrorWidget.svelte";
+    import LoadingWidget from "../lib/LoadingWidget.svelte";
     import SkewedButton from "../lib/SkewedButton.svelte";
 
     let emit = createEventDispatcher();
@@ -39,7 +41,7 @@
 </script>
 
 {#await loading}
-    <h2>načítání...</h2>
+    <LoadingWidget />
 {:then}
     <h2>Zvol balík k otevření</h2>
     <div class="listing">
@@ -52,9 +54,13 @@
             </Card>
         {/each}
     </div>
+    <SkewedButton
+        on:click={() => (window.location.href = "https://varnaparna.fun/")}
+        >zpátky do várny</SkewedButton
+    >
 {:catch}
-    <h2>při načítání došlo k chybě</h2>
-    <SkewedButton on:click={load}>zkusit znovu</SkewedButton>
+    <ErrorWidget>Při načítání došlo k chybě</ErrorWidget>
+    <SkewedButton on:click={load}>Zkusit znovu</SkewedButton>
 {/await}
 
 <style>
@@ -63,6 +69,7 @@
         flex-direction: column;
         justify-content: center;
         max-width: 800px;
+        margin-bottom: 8px;
     }
 
     .listing :global(h1) {
