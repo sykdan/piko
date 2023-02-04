@@ -16,12 +16,9 @@
         }
     }
 
-    h2 {
-        text-align: center;
-    }
-
     div {
         margin-top: 16px;
+        text-align: center;
     }
 
     img {

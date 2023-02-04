@@ -58,18 +58,16 @@
 </div>
 
 <div class="content">
-    <div class="wrap">
-        {#if screen == ScreenState.MainScreen}
-            <MainScreen on:begin={begin} />
-        {:else if screen == ScreenState.DeckView}
-            <DeckView
-                on:close={() => {
-                    screen = ScreenState.MainScreen;
-                }}
-                base={openedPackUrl}
-            />
-        {/if}
-    </div>
+    {#if screen == ScreenState.MainScreen}
+        <MainScreen on:begin={begin} />
+    {:else if screen == ScreenState.DeckView}
+        <DeckView
+            on:close={() => {
+                screen = ScreenState.MainScreen;
+            }}
+            base={openedPackUrl}
+        />
+    {/if}
 </div>
 
 <style>
@@ -84,32 +82,27 @@
         background-color: #0f0f0f;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
         font-weight: bold;
-        margin-bottom: 8px;
         z-index: 999;
     }
 
     .content {
         display: flex;
-        height: 100%;
-        width: 100%;
+        height: calc(100% - 32px);
+        width: calc(100% - 32px);
         overflow: hidden;
-    }
-
-    .wrap {
-        width: 100%;
         padding: 16px;
 
-        display: flex;
-        overflow: hidden;
         flex-direction: column;
         align-items: center;
 
-        transition: padding 0.5s;
+        transition: 0.2s;
     }
 
     @media (max-width: 600px) {
-        .wrap {
-            padding: 2px;
+        .content {
+            padding: 8px 2px;
+            height: calc(100% - 16px);
+            width: calc(100% - 4px);
         }
     }
 </style>

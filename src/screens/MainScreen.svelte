@@ -59,8 +59,8 @@
         >zpátky do várny</SkewedButton
     >
 {:catch}
-    <ErrorWidget>Při načítání došlo k chybě</ErrorWidget>
-    <SkewedButton on:click={load}>Zkusit znovu</SkewedButton>
+    <ErrorWidget>při načítání došlo k chybě</ErrorWidget>
+    <SkewedButton on:click={load}>zkusit znovu</SkewedButton>
 {/await}
 
 <style>

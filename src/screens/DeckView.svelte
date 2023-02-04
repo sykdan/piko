@@ -5,6 +5,8 @@
     import SkewedButton from "../lib/SkewedButton.svelte";
     import Overlay from "../lib/Overlay.svelte";
     import Card from "../lib/Card.svelte";
+    import LoadingWidget from "../lib/LoadingWidget.svelte";
+    import ErrorWidget from "../lib/ErrorWidget.svelte";
 
     const emit = createEventDispatcher();
 
@@ -23,16 +25,15 @@
     // the {something} of the ./data/{something} url
     export let base = "";
 
-    
     // html and csv contents
     let schema;
     let cards;
-    
+
     // index of the currently displayed card
     let viewing_card: number = null;
-    
+
     let show_listing = false;
-    
+
     // whether the spin animation should play
     let spin: boolean = false;
     // display
@@ -42,7 +43,7 @@
     $: if (viewing_card != null) {
         show_back_instead_of_front = false;
     }
-    
+
     $: if (viewing_card != null) {
         if (show_listing) {
             $Aux.text = "×";
@@ -111,15 +112,16 @@
 </script>
 
 {#await loading}
-    <!-- Loading -->
-    <h2>načítání...</h2>
+    <LoadingWidget />
 {:then}
-    <!-- Main content -->
     <div class="card" class:show_back_instead_of_front class:spin>
         {#if viewing_card != null}
             {@html cards.columns.reduce(
                 (html, word) =>
-                    html.replaceAll(`{{${word}}}`, cards[viewing_card][word]),
+                    html.replaceAll(
+                        `{{${word}}}`,
+                        cards[viewing_card][word].replaceAll("\n", "<br>")
+                    ),
                 schema
             )}
         {/if}
@@ -155,8 +157,7 @@
         </Overlay>
     {/if}
 {:catch}
-    <!-- Loading error -->
-    <h2>při načítání došlo k chybě</h2>
+    <ErrorWidget>při načítání došlo k chybě</ErrorWidget>
     <SkewedButton on:click={load}>zkusit znovu</SkewedButton>
 {/await}
 
@@ -176,10 +177,10 @@
     }
 
     .card {
-        width: 100%;
+        width: calc(100% - 32px);
         max-width: 800px;
         height: 100%;
-        padding: 16px 0;
+        padding: 16px 16px;
         margin-bottom: 8px;
         display: flex;
 
