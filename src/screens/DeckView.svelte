@@ -15,11 +15,13 @@
         $Aux.callback = () => {
             show_listing = !show_listing;
         };
+        window.addEventListener("keydown", keyboard_key);
     });
 
     onDestroy(() => {
         $Aux.text = null;
         $Aux.callback = null;
+        window.removeEventListener("keydown", keyboard_key);
     });
 
     // the {something} of the ./data/{something} url
@@ -104,10 +106,33 @@
         viewing_card = c;
     }
 
+    function randomize() {
+        viewing_card = Math.floor(Math.random() * cards.length);
+    }
+
     // On card from list selected
     function selectCardFromList(index: number) {
         viewing_card = index;
         show_listing = false;
+    }
+
+    function keyboard_key(e: KeyboardEvent) {
+        if (e.key == "ArrowLeft") {
+            jump(-1);
+            e.preventDefault();
+        }
+        if (e.key == "ArrowRight") {
+            jump(1);
+            e.preventDefault();
+        }
+        if (e.key == " ") {
+            turn();
+            e.preventDefault();
+        }
+        if (e.key == "r") {
+            randomize();
+            e.preventDefault();
+        }
     }
 </script>
 
@@ -127,12 +152,11 @@
         {/if}
     </div>
 
-    <SkewedButton on:click={turn}>
-        {show_back_instead_of_front ? "Skryj" : "Ukaž"} druhou stranu
-    </SkewedButton>
+    <SkewedButton on:click={turn}>Otočit kartu</SkewedButton>
 
     <div class="controls">
         <SkewedButton on:click={() => jump(-1)}>&lt;</SkewedButton>
+        <SkewedButton on:click={() => randomize()}>🎲</SkewedButton>
         <SkewedButton on:click={() => jump(1)}>&gt;</SkewedButton>
     </div>
 
@@ -224,8 +248,6 @@
     .listing {
         display: flex;
         flex-direction: column;
-        max-width: 800px;
-        width: 100%;
     }
 
     .overlay-card {
@@ -234,9 +256,16 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+        max-width: 800px;
+        width: 100%;
     }
 
     .overlay-card h1 {
         margin: 8px 24px 8px 0px;
+    }
+
+    :global(.back),
+    :global(.front) {
+        width: 100%;
     }
 </style>

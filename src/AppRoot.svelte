@@ -22,7 +22,7 @@
     function home() {
         window.location.hash = "";
         if (screen == ScreenState.MainScreen) {
-            alert(`PikoAnki verze ${version}\nVytvořil Daniel Sýkora`);
+            alert(`Piko verze ${version}\nVytvořil Daniel Sýkora`);
         } else {
             screen = ScreenState.MainScreen;
         }
@@ -43,7 +43,7 @@
         gravitate="left"
         on:click={home}
         background="linear-gradient(90deg, rgba(194,1,20,1) 0%, rgba(245,94,10,1) 100%)"
-        >Piko (Anki)</SkewedButton
+        >Piko</SkewedButton
     >
     <div style="width: 100%;" />
     {#if $Aux.text}
