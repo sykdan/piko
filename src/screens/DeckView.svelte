@@ -156,13 +156,13 @@
 
     <div class="controls">
         <SkewedButton on:click={() => jump(-1)}>
-            <img src="/assets/arrow-left.svg" alt="" />
+            <img src="assets/arrow-left.svg" alt="" />
         </SkewedButton>
         <SkewedButton on:click={() => randomize()}>
-            <img src="/assets/random.svg" alt="" />
+            <img src="assets/random.svg" alt="" />
         </SkewedButton>
         <SkewedButton on:click={() => jump(1)}>
-            <img src="/assets/arrow-right.svg" alt="" />
+            <img src="assets/arrow-right.svg" alt="" />
         </SkewedButton>
     </div>
 
