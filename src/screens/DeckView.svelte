@@ -155,9 +155,15 @@
     <SkewedButton on:click={turn}>Otočit kartu</SkewedButton>
 
     <div class="controls">
-        <SkewedButton on:click={() => jump(-1)}>&lt;</SkewedButton>
-        <SkewedButton on:click={() => randomize()}>🎲</SkewedButton>
-        <SkewedButton on:click={() => jump(1)}>&gt;</SkewedButton>
+        <SkewedButton on:click={() => jump(-1)}>
+            <img src="/assets/arrow-left.svg" alt="" />
+        </SkewedButton>
+        <SkewedButton on:click={() => randomize()}>
+            <img src="/assets/random.svg" alt="" />
+        </SkewedButton>
+        <SkewedButton on:click={() => jump(1)}>
+            <img src="/assets/arrow-right.svg" alt="" />
+        </SkewedButton>
     </div>
 
     {#if show_listing}
@@ -267,5 +273,11 @@
     :global(.back),
     :global(.front) {
         width: 100%;
+    }
+
+    .controls img {
+        width: 48px;
+        height: 48px;
+        vertical-align: middle;
     }
 </style>
