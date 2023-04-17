@@ -1,4 +1,4 @@
-# Piko
+# [Piko](https://varnaparna.fun/piko)
 Prohlížeč kartiček s poznámkami napsaný ve SvelteJS
 
 ## Instrukce k sestavení
